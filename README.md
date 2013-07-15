@@ -2,23 +2,7 @@
 
 A simple web screenshot/archiving tool.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'webshot'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install webshot
-
-## Usage
-
-
+Currently in the rough prototype stage.
 
 ## Contributing
 
