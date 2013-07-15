@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'webshot/cli'
+Webshot::CLI.start
