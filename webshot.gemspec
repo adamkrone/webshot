@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Webshot::VERSION
   spec.authors       = ["Adam Krone"]
   spec.email         = ["krone.adam@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Write a gem description}
+  spec.summary       = %q{Write a gem summary}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,4 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+
+  spec.add_dependency "thor"
+  spec.add_dependency "selenium-webdriver"
+  spec.add_dependency "colorize"
 end

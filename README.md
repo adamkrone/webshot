@@ -1,6 +1,6 @@
 # Webshot
 
-TODO: Write a gem description
+A simple web screenshot/archiving tool.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
 
 ## Contributing
 
