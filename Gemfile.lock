@@ -3,6 +3,7 @@ PATH
   specs:
     webshot (0.0.1)
       colorize
+      rmagick
       selenium-webdriver
       thor
 
@@ -15,6 +16,7 @@ GEM
     ffi (1.9.0)
     multi_json (1.7.7)
     rake (10.1.0)
+    rmagick (2.13.2)
     rubyzip (0.9.9)
     selenium-webdriver (2.33.0)
       childprocess (>= 0.2.5)

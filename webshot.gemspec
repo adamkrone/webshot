@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor"
   spec.add_dependency "selenium-webdriver"
   spec.add_dependency "colorize"
+  spec.add_dependency "rmagick"
 end

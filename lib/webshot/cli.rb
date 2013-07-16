@@ -56,19 +56,6 @@ module Webshot
       end
     end
 
-    desc "archive", "Archives a page or pages"
-    option :url, :aliases => "-u"
-    option :sitemap, :aliases => "-s"
-    option :output, :aliases => "-o"
-    option :diff, :type => :boolean, :aliases => "-d"
-    def archive
-      if options[:sitemap]
-        urls = get_sitemap url
-      else
-        urls = ["#{options[:url]}"]
-      end
-    end
-
     private
 
     def get_sitemap(sitemap_url)
@@ -151,16 +138,6 @@ module Webshot
       else
         nil
       end
-    end
-
-    def extract_resources(page)
-      resources = []
-
-      resources << page.xpath('//link[@rel="stylesheet"]')
-      resources << page.xpath('//script[@src]')
-      resources << page.xpath('//img[@src]')
-
-      return resources
     end
   end
 end

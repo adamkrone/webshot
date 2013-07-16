@@ -1,3 +1,6 @@
+require 'rmagick'
+include Magick
+
 module Webshot
   class Diff
     def initialize(last_version, current_version, current_page)
@@ -20,8 +23,22 @@ module Webshot
         end
 
         puts "Comparing #{new_file} with older version: #{last_file}".green
-        system "compare #{last_file} #{new_file} #{diff_dir}/#{diff_file}"
-        puts "Diff #{diff_dir}/#{diff_file} saved.".green
+
+        image1 = ImageList.new(last_file)
+        image2 = ImageList.new(new_file)
+
+        begin
+          diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
+        rescue
+          diff = ["#{diff_dir}/#{diff_file}", 1]
+        end
+        
+        if diff[1] == 0
+          puts "No changes found.".yellow
+        else
+          system "compare #{last_file} #{new_file} #{diff_dir}/#{diff_file}"
+          puts "Diff #{diff_dir}/#{diff_file} saved.".green
+        end
       else
         puts "Not found.".yellow
       end
