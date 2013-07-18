@@ -3,17 +3,19 @@ include Magick
 
 module Webshot
   class Diff
-    def initialize(last_version, current_version, current_page)
+    def initialize(last_version, current_version, current_page, verbose)
       @last_version = last_version
       @current_version = current_version
       @current_page = current_page
+      @verbose = verbose
     end
 
     def get_image_diff
       last_file = @current_page.old_version(@last_version)
       new_file = @current_page.screenshot
 
-      puts "Checking for #{last_file}...".yellow
+      puts "\tDiff:"
+      puts "\tChecking for #{last_file}..." if @verbose
       if File.exist?(last_file) and @last_version != nil
         diff_dir = "diffs/#{@current_page.browser}/#{@current_page.breakpoint}/#{@current_page.url}"
         diff_file = "#{@last_version}-vs-#{@current_version}.png"
@@ -22,7 +24,11 @@ module Webshot
           FileUtils.mkdir_p diff_dir
         end
 
-        puts "Comparing #{new_file} with older version: #{last_file}".green
+        if @verbose
+          puts "\tComparing:"
+          puts "\tnew version: #{new_file}"
+          puts "\tolder version: #{last_file}"
+        end
 
         image1 = ImageList.new(last_file)
         image2 = ImageList.new(new_file)
@@ -34,13 +40,13 @@ module Webshot
         end
         
         if diff[1] == 0
-          puts "No changes found.".yellow
+          puts "\tNo changes found.".yellow if @verbose
         else
           system "compare #{last_file} #{new_file} #{diff_dir}/#{diff_file}"
-          puts "Diff #{diff_dir}/#{diff_file} saved.".green
+          puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
         end
       else
-        puts "Not found.".yellow
+        puts "\tNot found.".yellow if @verbose
       end
     end
   end

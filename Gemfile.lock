@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    webshot (0.0.1)
+    webshot (0.5.0)
       colorize
       rmagick
       selenium-webdriver
