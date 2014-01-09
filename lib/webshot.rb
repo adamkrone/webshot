@@ -3,6 +3,7 @@ require 'webshot/cli'
 require 'webshot/page'
 require 'webshot/diff'
 require 'webshot/config'
+require 'webshot/viewer'
 
 module Webshot
 end
