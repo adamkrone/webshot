@@ -29,6 +29,7 @@ module Webshot
           "url" => "http://example.com",
           "sitemap" => false,
           "browsers" => ["firefox"],
+          "breakpoints" => ["320x480", "480x320", "768x1024", "1024x768"],
           "diff" => true,
           "verbose" => false
         }

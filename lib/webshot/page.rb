@@ -19,7 +19,7 @@ module Webshot
     end
 
     def get_filename
-      @url.split("/")[-1] + "-#{@breakpoint}.png"
+      @url.split("/")[-1] + ".png"
     end
 
     def mkdirs

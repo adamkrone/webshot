@@ -19,5 +19,14 @@ screenshots.each { |screenshot| puts "\t\t#{screenshot}" }
 puts "The previous version is: #{previous_version}"
 
 puts "\tLoading diffs between current and previous versions..."
-diffs = viewer.diffs(previous_version, current_version)
+diffs = viewer.diff_by_version(previous_version, current_version)
 diffs.each { |diff| puts "\t\t#{diff}" }
+
+puts "Pages:"
+pages = viewer.pages(current_version)
+pages.each { |page| puts "\t#{page}" }
+
+home_page = "www.thirdwave.dev02.thirdwavellc.com/content.cfm/home"
+puts "Diffs for home page (#{home_page}):"
+diffs = viewer.diff_by_page(home_page)
+diffs.each { |diff| puts "\t#{diff}" }

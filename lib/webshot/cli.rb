@@ -57,7 +57,7 @@ module Webshot
 
       @config.settings["browsers"].each do |browser|
         begin
-          puts "Using #{browser.capitalize}...".yellow if @config.settings["verbose"]
+          puts "\nUsing #{browser.capitalize}...".yellow if @config.settings["verbose"]
           get_screenshots(urls, browser.to_sym)
         rescue Selenium::WebDriver::Error::UnknownError => e
           puts "Sorry, we encountered an error..."
@@ -122,7 +122,7 @@ module Webshot
           end
         end
 
-        puts "Capturing #{breakpoint['name']} breakpoint".yellow if @config.settings["verbose"]
+        puts "\nCapturing #{breakpoint['name']} breakpoint".yellow if @config.settings["verbose"]
 
         urls.each do |url|
           puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
@@ -153,7 +153,7 @@ module Webshot
       end_time = Time.now
       @total_urls += num_urls
 
-      puts "Captured #{num_urls} urls in #{browser.to_s.capitalize} in #{end_time - current_run_start} seconds.".green
+      puts "\nCaptured #{num_urls} urls in #{browser.to_s.capitalize} in #{end_time - current_run_start} seconds.".green
     end
 
     def get_last_version(base_dir)

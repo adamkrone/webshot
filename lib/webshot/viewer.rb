@@ -1,6 +1,6 @@
 module Webshot
   class Viewer
-    attr_accessor :versions, :browsers, :screenshots, :diffs
+    attr_accessor :versions, :browsers, :pages, :screenshots, :diff_by_version, :diff_by_page
 
     def initialize(options = {:screenshot_dir => "./screenshots",
                               :diff_dir => "./diffs"})
@@ -39,6 +39,19 @@ module Webshot
       end
     end
 
+    def pages(version)
+      browser = browsers(version)[0]
+      pages_path = "#{@screenshot_dir}/#{version}/#{browser}/*/"
+
+      pages = Dir.glob("#{pages_path}**/*.png").map do |page|
+        page = page.gsub(/#{@screenshot_dir}\/#{version}\//, "")
+        page = page.split("/").drop(2).join("/")
+        page.gsub(/\.png/, "")
+      end
+
+      pages.uniq
+    end
+
     def screenshots(version, options = {})
       browser = options[:browser] ? "#{options[:browser]}/" : ""
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : ""
@@ -47,13 +60,24 @@ module Webshot
       Dir.glob(screenshots)
     end
 
-    def diffs(version1, version2, options = {})
+    def diff_by_version(version1, version2, options = {})
       options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
       options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
 
       browser = options[:browser] ? "#{options[:browser]}/" : "*/"
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
       diffs = "#{@diff_dir}/#{browser}#{breakpoint}**/#{version1}-vs-#{version2}.png"
+
+      Dir.glob(diffs)
+    end
+
+    def diff_by_page(page, options = {})
+      options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
+      options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
+
+      browser = options[:browser] ? "#{options[:browser]}/" : "*/"
+      breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
+      diffs = "#{@diff_dir}/#{browser}#{breakpoint}#{page}/*.png"
 
       Dir.glob(diffs)
     end
