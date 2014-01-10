@@ -12,7 +12,7 @@ module Webshot
       if File.exist? "Shotfile"
         YAML.load(File.read "Shotfile")
       else
-	nil
+        nil
       end
     end
 
@@ -28,8 +28,8 @@ module Webshot
         config = {
           "url" => "http://example.com",
           "sitemap" => false,
-          "browsers" => ["firefox", "chrome"],
-          "diff" => false,
+          "browsers" => ["firefox"],
+          "diff" => true,
           "verbose" => false
         }
 

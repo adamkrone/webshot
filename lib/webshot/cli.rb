@@ -32,7 +32,7 @@ module Webshot
 
       if options.count == 0 && @config.settings == nil
         puts "You must provide a --url, or configure a Shotfile using 'webshot init'."
-	exit
+        exit
       end
 
       if @config.settings["sitemap"]
@@ -41,13 +41,36 @@ module Webshot
         urls = ["#{@config.settings['url']}"]
       end
 
+      if @config.settings["breakpoints"]
+        @config.settings["breakpoints"].each_with_index do |breakpoint, i|
+          name = breakpoint
+          breakpoint = breakpoint.split("x")
+          width = breakpoint[0].to_i
+          height = breakpoint[1].to_i
+
+          @config.settings["breakpoints"][i] = {"name" => name, "width" => width, "height" => height}
+        end
+      else
+        puts "You must provide at least one breakpoint."
+        exit
+      end
+
       @config.settings["browsers"].each do |browser|
-        puts "Using #{browser.capitalize}...".yellow if @config.settings["verbose"]
-        get_screenshots(urls, browser.to_sym)
+        begin
+          puts "Using #{browser.capitalize}...".yellow if @config.settings["verbose"]
+          get_screenshots(urls, browser.to_sym)
+        rescue Selenium::WebDriver::Error::UnknownError => e
+          puts "Sorry, we encountered an error..."
+          if @config.settings["verbose"]
+            puts e.message
+            puts e.backtrace
+          end
+          exit
+        end
       end
 
       end_time = Time.now.to_i
-      puts "Total: #{@total_urls} urls in #{end_time - start_time} seconds.".green
+      puts "Total: captured #{@total_urls} urls in #{end_time - start_time} seconds.".green
     end
 
     desc "init", "Initialize project with Shotfile"
@@ -130,7 +153,7 @@ module Webshot
       end_time = Time.now
       @total_urls += num_urls
 
-      puts "Rendered #{num_urls} urls in #{browser.to_s.capitalize} in #{end_time - current_run_start} seconds.".green
+      puts "Captured #{num_urls} urls in #{browser.to_s.capitalize} in #{end_time - current_run_start} seconds.".green
     end
 
     def get_last_version(base_dir)
