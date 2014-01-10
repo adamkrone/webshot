@@ -60,12 +60,16 @@ module Webshot
       Dir.glob(screenshots)
     end
 
-    def diff_by_version(version1, version2, options = {})
+    def diff_by_version(version, options = {})
       options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
       options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
 
       browser = options[:browser] ? "#{options[:browser]}/" : "*/"
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
+
+      version2 = version
+      version_index = versions.index(version2)
+      version1 = versions[version_index - 1]
       diffs = "#{@diff_dir}/#{browser}#{breakpoint}**/#{version1}-vs-#{version2}.png"
 
       Dir.glob(diffs)
