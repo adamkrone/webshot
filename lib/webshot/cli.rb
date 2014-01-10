@@ -11,26 +11,12 @@ require 'webshot/config'
 module Webshot
   class CLI < Thor
     START_TIME = Time.now
-    BREAKPOINTS = [
-      { "name" => "320x480",
-        "width" => 320,
-        "height" => 480 },
-      { "name" => "480x320",
-        "width" => 480,
-        "height" => 320 },
-      { "name" => "768x1024",
-        "width" => 768,
-        "height" => 1024 },
-      { "name" => "1024x768",
-        "width" => 1024,
-        "height" => 768 }
-    ]
 
     desc "capture", "Captures screenshots of a page or pages"
     option :url, :aliases => "-u"
     option :sitemap, :aliases => "-s"
-    option :browsers, :type => :array, :default => ["firefox", "chrome"]
-    option :breakpoints, :type => :array, :default => BREAKPOINTS
+    option :browsers, :type => :array
+    option :breakpoints, :type => :array
     option :output, :aliases => "-o"
     option :diff, :type => :boolean, :aliases => "-d"
     option :wait, :type => :numeric, :aliases => "-w"
