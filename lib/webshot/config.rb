@@ -12,7 +12,7 @@ module Webshot
       if File.exist? "Shotfile"
         YAML.load(File.read "Shotfile")
       else
-        {}
+	nil
       end
     end
 

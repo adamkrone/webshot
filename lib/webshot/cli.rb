@@ -30,8 +30,9 @@ module Webshot
         @config.settings[option.to_s] = value
       end
 
-      if options.count == 0
+      if options.count == 0 && @config.settings == nil
         puts "You must provide a --url, or configure a Shotfile using 'webshot init'."
+	exit
       end
 
       if @config.settings["sitemap"]
