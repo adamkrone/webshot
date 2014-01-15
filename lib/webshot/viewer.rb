@@ -55,7 +55,8 @@ module Webshot
     def screenshots(version, options = {})
       browser = options[:browser] ? "#{options[:browser]}/" : ""
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : ""
-      screenshots = "#{@screenshot_dir}/#{version}/#{browser}#{breakpoint}**/*.png"
+      page = options[:page] ? "#{options[:page]}/" : ""
+      screenshots = "#{@screenshot_dir}/#{version}/#{browser}#{breakpoint}#{page}**/*.png"
 
       Dir.glob(screenshots)
     end
