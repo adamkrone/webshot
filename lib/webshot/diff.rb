@@ -1,4 +1,5 @@
 require 'rmagick'
+require 'open3'
 include Magick
 
 module Webshot
@@ -33,7 +34,6 @@ module Webshot
 
         image1 = ImageList.new(last_file)
         image2 = ImageList.new(new_file)
-        command = "compare -dissimilarity-threshold 1 -subimage-search #{last_file} #{new_file} #{diff_dir}/#{diff_file}"
 
         begin
           diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
@@ -44,8 +44,22 @@ module Webshot
         if diff[1] == 0
           puts "\tNo changes found.".yellow if @verbose
         else
-          system command
-          puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+          stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{last_file} #{new_file} #{diff_dir}/#{diff_file}")
+          error = (stderr.readlines).join("")
+
+          if (error.include? "differs") 
+            puts "\tImage size differs, swapping image order...".yellow if @verbose
+            stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{new_file} #{last_file} #{diff_dir}/#{diff_file}")
+            error = (stderr.readlines).join("")
+
+            if (error.include? "differs") 
+              puts "\tCouldn't save diff file!".red
+            else
+              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+            end
+          else
+            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+          end
         end
       else
         puts "\tNot found.".yellow if @verbose
