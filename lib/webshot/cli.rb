@@ -105,12 +105,12 @@ module Webshot
       num_urls = 0
       current_run_start = Time.now
       driver = Selenium::WebDriver.for browser
-      base_dir = options[:output] ? options[:output] : "screenshots"
+      base_dir = @config.settings["output"] ? @config.settings["output"] : "."
       current_version = START_TIME.to_i
-      last_version = get_last_version base_dir
+      last_version = get_last_version "#{base_dir}/screenshots"
 
       @config.settings["breakpoints"].each do |breakpoint|
-        directory = "#{base_dir}/#{current_version}/#{browser}/#{breakpoint['name']}/"
+        directory = "#{base_dir}/screenshots/#{current_version}/#{browser}/#{breakpoint['name']}/"
 
         unless File.directory? directory
           FileUtils.mkdir_p directory
@@ -141,14 +141,14 @@ module Webshot
           puts "Saved to #{current_file}".green if @config.settings["verbose"]
 
           if @config.settings["diff"]
-            current_diff = Webshot::Diff.new(last_version, current_version, current_page, @config.settings["verbose"])
+            current_diff = Webshot::Diff.new(base_dir, last_version, current_version, current_page, @config.settings["verbose"])
             current_diff.get_image_diff
           end
 
           num_urls += 1
         end
       end
-      
+
       driver.quit
       end_time = Time.now
       @total_urls += num_urls

@@ -3,7 +3,8 @@ include Magick
 
 module Webshot
   class Diff
-    def initialize(last_version, current_version, current_page, verbose)
+    def initialize(base_dir, last_version, current_version, current_page, verbose)
+      @base_dir = base_dir
       @last_version = last_version
       @current_version = current_version
       @current_page = current_page
@@ -17,7 +18,7 @@ module Webshot
       puts "\tDiff:"
       puts "\tChecking for #{last_file}..." if @verbose
       if File.exist?(last_file) and @last_version != nil
-        diff_dir = "diffs/#{@current_page.browser}/#{@current_page.breakpoint}/#{@current_page.url}"
+        diff_dir = "#{@base_dir}/diffs/#{@current_page.browser}/#{@current_page.breakpoint}/#{@current_page.url}"
         diff_file = "#{@last_version}-vs-#{@current_version}.png"
 
         unless File.directory? diff_dir
