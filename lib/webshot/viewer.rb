@@ -52,11 +52,12 @@ module Webshot
       pages.uniq
     end
 
-    def screenshots(version, options = {})
-      browser = options[:browser] ? "#{options[:browser]}/" : ""
-      breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : ""
-      page = options[:page] ? "#{options[:page]}/" : ""
-      screenshots = "#{@screenshot_dir}/#{version}/#{browser}#{breakpoint}#{page}**/*.png"
+    def screenshots(options = {})
+      version = options[:version] ? "#{options[:version]}" : "*"
+      browser = options[:browser] ? "#{options[:browser]}" : "*"
+      breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}" : "*"
+      page = options[:page] ? "#{options[:page]}.png" : "**/*.png"
+      screenshots = "#{@screenshot_dir}/#{version}/#{browser}/#{breakpoint}/#{page}"
 
       Dir.glob(screenshots)
     end
