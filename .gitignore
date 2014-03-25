@@ -3,3 +3,4 @@ screenshots/
 diffs/
 *.log
 Shotfile
+Gemfile.lock

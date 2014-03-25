@@ -13,13 +13,13 @@ puts "\tIt has screenshots for the following breakpoints:"
 viewer.breakpoints(current_version).each { |breakpoint| puts "\t\t#{breakpoint}" }
 
 puts "\tLoading current version's screenshots..."
-screenshots = viewer.screenshots(current_version)
+screenshots = viewer.screenshots({:version => current_version})
 screenshots.each { |screenshot| puts "\t\t#{screenshot}" }
 
 puts "The previous version is: #{previous_version}"
 
 puts "\tLoading diffs between current and previous versions..."
-diffs = viewer.diff_by_version(previous_version, current_version)
+diffs = viewer.diffs({:version1 => previous_version, :version2 => current_version})
 diffs.each { |diff| puts "\t\t#{diff}" }
 
 puts "Pages:"
