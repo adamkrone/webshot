@@ -62,7 +62,7 @@ module Webshot
       Dir.glob(screenshots)
     end
 
-    def diffs(options = {:version1 => previous_version, :version2 => current_version})
+    def diffs(options = {})
       options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
       options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
 
@@ -70,8 +70,8 @@ module Webshot
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
       page = options[:page] ? "#{options[:page]}/" : "**/"
 
-      version2 = options[:version2]
-      version1 = options[:version1]
+      version2 = options[:version2] || previous_version
+      version1 = options[:version1] || current_version
       diffs = "#{@diff_dir}/#{browser}#{breakpoint}#{page}#{version1}-vs-#{version2}.png"
 
       Dir.glob(diffs)
