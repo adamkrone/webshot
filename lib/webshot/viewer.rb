@@ -70,8 +70,8 @@ module Webshot
       breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
       page = options[:page] ? "#{options[:page]}/" : "**/"
 
-      version2 = options[:version2] || previous_version
-      version1 = options[:version1] || current_version
+      version2 = options[:version2] || current_version
+      version1 = options[:version1] || previous_version
       diffs = "#{@diff_dir}/#{browser}#{breakpoint}#{page}#{version1}-vs-#{version2}.png"
 
       Dir.glob(diffs)
