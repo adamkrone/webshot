@@ -2,10 +2,10 @@ module Webshot
   class Viewer
     attr_accessor :versions, :browsers, :pages, :screenshots, :diffs
 
-    def initialize(options = {:screenshot_dir => "./screenshots",
+    def initialize(args = {:screenshot_dir => "./screenshots",
                               :diff_dir => "./diffs"})
-      @screenshot_dir = options[:screenshot_dir]
-      @diff_dir = options[:diff_dir]
+      @screenshot_dir = args[:screenshot_dir]
+      @diff_dir = args[:diff_dir]
     end
 
     def versions
