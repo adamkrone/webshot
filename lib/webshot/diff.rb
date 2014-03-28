@@ -19,8 +19,8 @@ module Webshot
       puts "\tDiff:"
       puts "\tChecking for #{last_file}..." if @verbose
       if File.exist?(last_file) and @old_version != nil
-	diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
-	diff_file = "#{@old_version}-vs-#{@current_version}.png"
+        diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+        diff_file = "#{@old_version}-vs-#{@current_version}.png"
 
         unless File.directory? diff_dir
           FileUtils.mkdir_p diff_dir
@@ -42,7 +42,7 @@ module Webshot
         end
 
         if diff[1] == 0
-          puts "\tNo changes found.".yellow if @verbose
+          puts "\tNo changes found.".yellow
         else
           stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{last_file} #{new_file} #{diff_dir}/#{diff_file}")
           error = (stderr.readlines).join("")
@@ -55,14 +55,14 @@ module Webshot
             if (error.include? "differs") 
               puts "\tCouldn't save diff file!".red
             else
-              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
             end
           else
-            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
           end
         end
       else
-        puts "\tNot found.".yellow if @verbose
+        puts "\tScreenshot not found.".yellow
       end
     end
   end
