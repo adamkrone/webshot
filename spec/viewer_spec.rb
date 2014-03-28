@@ -1,4 +1,4 @@
-require 'webshot'
+require 'spec_helper'
 
 describe Webshot::Viewer do
   let(:viewer) { Webshot::Viewer.new }
