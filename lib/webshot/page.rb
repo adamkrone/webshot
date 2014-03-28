@@ -2,12 +2,12 @@ module Webshot
   class Page
     attr_reader :url, :path, :filename, :browser, :breakpoint, :screenshot
 
-    def initialize(url, current_version, directory, browser, breakpoint)
-      @url = url.gsub(/http:\/\/|https:\/\//, "")
-      @current_version = current_version
-      @path = get_path(directory)
-      @browser = browser
-      @breakpoint = breakpoint
+    def initialize(args)
+      @url = args[:url].gsub(/http:\/\/|https:\/\//, "")
+      @version = args[:version]
+      @path = get_path(args[:directory])
+      @browser = args[:browser]
+      @breakpoint = args[:breakpoint]
       @filename = get_filename
       @screenshot = @path + @filename
     end
@@ -34,7 +34,7 @@ module Webshot
     end
 
     def old_version(version)
-      @screenshot.gsub(@current_version.to_s, version.to_s)
+      @screenshot.gsub(@version.to_s, version.to_s)
     end
   end
 end
