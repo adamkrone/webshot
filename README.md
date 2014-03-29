@@ -1,4 +1,4 @@
-# Webshot
+# Webshot [![Code Climate](https://codeclimate.com/github/adamkrone/webshot.png)](https://codeclimate.com/github/adamkrone/webshot)
 
 A simple web screenshot/archiving tool.
 
