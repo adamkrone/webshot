@@ -113,10 +113,9 @@ module Webshot
 
       sleep @config.settings[:wait] || 0
 
-      current_file = current_page.screenshot
       @current_page.save(@driver)
 
-      puts "Saved to #{current_file}".green if @config.settings["verbose"]
+      puts "Saved to #{current_page.screenshot}".green if @config.settings["verbose"]
     end
 
     def save_diff
