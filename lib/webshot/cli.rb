@@ -1,9 +1,9 @@
 require 'thor'
-require 'net/http'
-require 'rexml/document'
 require 'colorize'
 
 require 'webshot/config'
+require 'webshot/sitemap'
+require 'webshot/breakpoint'
 require 'webshot/runner'
 
 module Webshot
@@ -41,19 +41,20 @@ module Webshot
       end
 
       if @config.settings["sitemap"]
-        urls = read_sitemap @config.settings["url"]
+        urls = Webshot::Sitemap.new(@config.settings["url"]).urls
       else
         urls = ["#{@config.settings['url']}"]
       end
 
+      if urls == nil
+        puts "I don't know what to do with '#{url}'..."
+        puts "Please use a valid URL."
+        exit
+      end
+
       if @config.settings["breakpoints"]
         @config.settings["breakpoints"].each_with_index do |breakpoint, i|
-          name = breakpoint
-          breakpoint = breakpoint.split("x")
-          width = breakpoint[0].to_i
-          height = breakpoint[1].to_i
-
-          @config.settings["breakpoints"][i] = {"name" => name, "width" => width, "height" => height}
+          @config.settings["breakpoints"][i] = Webshot::Breakpoint.new(breakpoint)
         end
       else
         puts "You must provide at least one breakpoint."
@@ -64,27 +65,6 @@ module Webshot
                                    :version => START_TIME.to_i,
                                    :urls => urls)
       runner.start
-    end
-
-    private
-
-    def read_sitemap(sitemap_url)
-      url = sitemap_url
-      begin
-        request = Net::HTTP.get_response(URI.parse(url)).body
-      rescue URI::InvalidURIError
-        puts "I don't know what to do with '#{url}'..."
-        puts "Please use a valid URL."
-        exit
-      end
-      sitemap = REXML::Document.new request
-
-      urls = []
-      sitemap.elements.each "urlset/url/loc" do |url|
-        urls << url.text
-      end
-
-      return urls
     end
   end
 end

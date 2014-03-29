@@ -62,7 +62,7 @@ module Webshot
 
     def capture_breakpoint(breakpoint)
       @current_breakpoint = breakpoint
-      directory = "#{@base_dir}/screenshots/#{@version}/#{@current_browser}/#{@current_breakpoint['name']}/"
+      directory = "#{@base_dir}/screenshots/#{@version}/#{@current_browser}/#{@current_breakpoint.name}/"
 
       unless File.directory? directory
         FileUtils.mkdir_p directory
@@ -74,19 +74,19 @@ module Webshot
         end
       end
 
-      puts "\nCapturing #{@current_breakpoint['name']} breakpoint".yellow if @config.settings["verbose"]
+      puts "\nCapturing #{@current_breakpoint.name} breakpoint".yellow if @config.settings["verbose"]
 
       urls.each do |url|
         puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
 
-        @driver.manage.window.resize_to(@current_breakpoint["width"], @current_breakpoint["height"])
+        @driver.manage.window.resize_to(@current_breakpoint.width, @current_breakpoint.height)
         @driver.get url
 
         current_page = Webshot::Page.new(:url => url,
                                          :version => @version,
                                          :directory => directory,
                                          :browser => @current_browser,
-                                         :breakpoint => @current_breakpoint["name"])
+                                         :breakpoint => @current_breakpoint.name)
 
         sleep @config.settings[:wait] || 0
 
