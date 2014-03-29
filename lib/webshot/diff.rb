@@ -35,11 +35,7 @@ module Webshot
         image1 = ImageList.new(last_file)
         image2 = ImageList.new(new_file)
 
-        begin
-          diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
-        rescue
-          diff = ["#{@diff_dir}/#{@diff_file}", 1]
-        end
+        diff = compare_channel(image1, image2)
 
         if diff[1] == 0
           puts "\tNo changes found.".yellow
@@ -52,6 +48,16 @@ module Webshot
     end
 
     private
+
+    def compare_channel(image1, image2)
+      begin
+        diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
+      rescue
+        diff = ["#{@diff_dir}/#{@diff_file}", 1]
+      end
+
+      return diff
+    end
 
     def compare(file1, file2, retry_compare)
       stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{file1} #{file2} #{@diff_dir}/#{@diff_file}")
