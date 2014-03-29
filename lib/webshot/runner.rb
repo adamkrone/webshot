@@ -69,11 +69,27 @@ module Webshot
     end
 
     def capture_breakpoint(breakpoint)
-      @current_breakpoint = breakpoint
-      directory = "#{@base_dir}/screenshots/#{@version}/#{@current_browser}/#{@current_breakpoint.name}/"
+      setup_breakpoint(breakpoint)
 
-      unless File.directory? directory
-        FileUtils.mkdir_p directory
+      urls.each do |url|
+        save_screenshot(url)
+        save_diff
+        @browser_urls += 1
+      end
+    end
+
+    def setup_breakpoint(breakpoint)
+      @current_breakpoint = breakpoint
+      @directory = "#{@base_dir}/screenshots/#{@version}/#{@current_browser}/#{@current_breakpoint.name}/"
+
+      check_directory
+
+      puts "\nCapturing #{@current_breakpoint.name} breakpoint".yellow if @config.settings["verbose"]
+    end
+
+    def check_directory
+      unless File.directory? @directory
+        FileUtils.mkdir_p @directory
       end
 
       if @config.settings[:diff]
@@ -81,39 +97,36 @@ module Webshot
           FileUtils.mkdir_p "diffs/"
         end
       end
+    end
 
-      puts "\nCapturing #{@current_breakpoint.name} breakpoint".yellow if @config.settings["verbose"]
+    def save_screenshot(url)
+      puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
 
-      urls.each do |url|
-        puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
+      @driver.manage.window.resize_to(@current_breakpoint.width, @current_breakpoint.height)
+      @driver.get url
 
-        @driver.manage.window.resize_to(@current_breakpoint.width, @current_breakpoint.height)
-        @driver.get url
+      @current_page = Webshot::Page.new(:url => url,
+                                       :version => @version,
+                                       :directory => @directory,
+                                       :browser => @current_browser,
+                                       :breakpoint => @current_breakpoint.name)
 
-        current_page = Webshot::Page.new(:url => url,
-                                         :version => @version,
-                                         :directory => directory,
-                                         :browser => @current_browser,
-                                         :breakpoint => @current_breakpoint.name)
+      sleep @config.settings[:wait] || 0
 
-        sleep @config.settings[:wait] || 0
+      current_file = current_page.screenshot
+      @current_page.save(@driver)
 
-        current_file = current_page.screenshot
+      puts "Saved to #{current_file}".green if @config.settings["verbose"]
+    end
 
-        current_page.save(@driver)
-
-        puts "Saved to #{current_file}".green if @config.settings["verbose"]
-
-        if @config.settings["diff"]
-          current_diff = Webshot::Diff.new(:base_dir => @base_dir,
-                                           :old_version => @old_version,
-                                           :current_version => @version.to_i,
-                                           :page => current_page,
-                                           :verbose => @config.settings["verbose"])
-          current_diff.get_image_diff
-        end
-
-        @browser_urls += 1
+    def save_diff
+      if @config.settings["diff"]
+        current_diff = Webshot::Diff.new(:base_dir => @base_dir,
+                                         :old_version => @old_version,
+                                         :current_version => @version.to_i,
+                                         :page => @current_page,
+                                         :verbose => @config.settings["verbose"])
+        current_diff.get_image_diff
       end
     end
 
