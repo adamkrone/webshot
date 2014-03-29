@@ -13,56 +13,74 @@ module Webshot
     end
 
     def get_image_diff
-      last_file = @page.old_version(@old_version)
-      new_file = @page.screenshot
+      @last_file = @page.old_version(@old_version)
+      @new_file = @page.screenshot
 
       puts "\tDiff:"
-      puts "\tChecking for #{last_file}..." if @verbose
-      if File.exist?(last_file) and @old_version != nil
-        diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
-        diff_file = "#{@old_version}-vs-#{@current_version}.png"
+      check_file
+    end
 
-        unless File.directory? diff_dir
-          FileUtils.mkdir_p diff_dir
-        end
+    private
+
+    def check_file
+      puts "\tChecking for #{@last_file}..." if @verbose
+      if File.exist?(@last_file) and @old_version != nil
+        @diff_file = "#{@old_version}-vs-#{@current_version}.png"
+
+        check_dir
 
         if @verbose
           puts "\tComparing:"
-          puts "\tnew version: #{new_file}"
-          puts "\tolder version: #{last_file}"
+          puts "\tnew version: #{@new_file}"
+          puts "\tolder version: #{@last_file}"
         end
 
-        image1 = ImageList.new(last_file)
-        image2 = ImageList.new(new_file)
+        image1 = ImageList.new(@last_file)
+        image2 = ImageList.new(@new_file)
 
-        begin
-          diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
-        rescue
-          diff = ["#{diff_dir}/#{diff_file}", 1]
-        end
+        diff = compare_channel(image1, image2)
 
         if diff[1] == 0
           puts "\tNo changes found.".yellow
         else
-          stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{last_file} #{new_file} #{diff_dir}/#{diff_file}")
-          error = (stderr.readlines).join("")
-
-          if (error.include? "differs") 
-            puts "\tImage size differs, swapping image order...".yellow if @verbose
-            stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{new_file} #{last_file} #{diff_dir}/#{diff_file}")
-            error = (stderr.readlines).join("")
-
-            if (error.include? "differs") 
-              puts "\tCouldn't save diff file!".red
-            else
-              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
-            end
-          else
-            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
-          end
+          compare(@last_file, @new_file, true)
         end
       else
         puts "\tScreenshot not found.".yellow
+      end
+    end
+
+    def check_dir
+      @diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+
+      unless File.directory? @diff_dir
+        FileUtils.mkdir_p @diff_dir
+      end
+    end
+
+    def compare_channel(image1, image2)
+      begin
+        diff = image1.compare_channel(image2, MeanAbsoluteErrorMetric)
+      rescue
+        diff = ["#{@diff_dir}/#{@diff_file}", 1]
+      end
+
+      return diff
+    end
+
+    def compare(file1, file2, retry_compare)
+      stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{file1} #{file2} #{@diff_dir}/#{@diff_file}")
+      error = (stderr.readlines).join("")
+
+      if error.include? "differs"
+        if retry_compare
+          puts "\tImage size differs, swapping image order...".yellow if @verbose
+          compare(file2, file1, false)
+        else
+          puts "\tCouldn't save diff file!".red
+        end
+      else
+        puts "\tDiff saved to #{@diff_dir}/#{@diff_file}.".green
       end
     end
   end
