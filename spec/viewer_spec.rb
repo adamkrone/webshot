@@ -13,13 +13,17 @@ describe Webshot::Viewer do
 
   describe "#current_version" do
     it "should return the current version" do
-      pending "Need to setup a default set of testing screenshots"
+      viewer.should_receive(:versions).and_return(["123456789", "987654321"])
+
+      expect(viewer.current_version).to eq("987654321")
     end
   end
 
   describe "#previous_version" do
     it "should return the previous version" do
-      pending "Need to setup a default set of testing screenshots"
+      viewer.should_receive(:versions).and_return(["123456789", "987654321"])
+
+      expect(viewer.previous_version).to eq("123456789")
     end
   end
 
