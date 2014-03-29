@@ -15,8 +15,6 @@ module Webshot
         url = URI.parse(@sitemap_url)
         request = Net::HTTP.get_response(url).body
       rescue URI::InvalidURIError, TypeError
-        puts "I don't know what to do with '#{url}'..."
-        puts "Please use a valid URL."
         return nil
       end
 
