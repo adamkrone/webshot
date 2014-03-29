@@ -4,23 +4,23 @@ include Magick
 
 module Webshot
   class Diff
-    def initialize(base_dir, last_version, current_version, current_page, verbose)
-      @base_dir = base_dir
-      @last_version = last_version
-      @current_version = current_version
-      @current_page = current_page
-      @verbose = verbose
+    def initialize(args)
+      @base_dir = args[:base_dir]
+      @old_version = args[:old_version]
+      @current_version = args[:current_version]
+      @page = args[:page]
+      @verbose = args[:verbose]
     end
 
     def get_image_diff
-      last_file = @current_page.old_version(@last_version)
-      new_file = @current_page.screenshot
+      last_file = @page.old_version(@old_version)
+      new_file = @page.screenshot
 
       puts "\tDiff:"
       puts "\tChecking for #{last_file}..." if @verbose
-      if File.exist?(last_file) and @last_version != nil
-        diff_dir = "#{@base_dir}/diffs/#{@current_page.browser}/#{@current_page.breakpoint}/#{@current_page.url}"
-        diff_file = "#{@last_version}-vs-#{@current_version}.png"
+      if File.exist?(last_file) and @old_version != nil
+        diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+        diff_file = "#{@old_version}-vs-#{@current_version}.png"
 
         unless File.directory? diff_dir
           FileUtils.mkdir_p diff_dir
@@ -42,7 +42,7 @@ module Webshot
         end
 
         if diff[1] == 0
-          puts "\tNo changes found.".yellow if @verbose
+          puts "\tNo changes found.".yellow
         else
           stdin, stdout, stderr = Open3.popen3("compare -dissimilarity-threshold 1 -subimage-search #{last_file} #{new_file} #{diff_dir}/#{diff_file}")
           error = (stderr.readlines).join("")
@@ -55,14 +55,14 @@ module Webshot
             if (error.include? "differs") 
               puts "\tCouldn't save diff file!".red
             else
-              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+              puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
             end
           else
-            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green if @verbose
+            puts "\tDiff saved to #{diff_dir}/#{diff_file}.".green
           end
         end
       else
-        puts "\tNot found.".yellow if @verbose
+        puts "\tScreenshot not found.".yellow
       end
     end
   end

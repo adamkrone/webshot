@@ -1,11 +1,11 @@
 module Webshot
   class Viewer
-    attr_accessor :versions, :browsers, :pages, :screenshots, :diff_by_version, :diff_by_page
+    attr_accessor :versions, :browsers, :pages, :screenshots, :diffs
 
-    def initialize(options = {:screenshot_dir => "./screenshots",
+    def initialize(args = {:screenshot_dir => "./screenshots",
                               :diff_dir => "./diffs"})
-      @screenshot_dir = options[:screenshot_dir]
-      @diff_dir = options[:diff_dir]
+      @screenshot_dir = args[:screenshot_dir]
+      @diff_dir = args[:diff_dir]
     end
 
     def versions
@@ -22,7 +22,7 @@ module Webshot
       versions[-2]
     end
 
-    def browsers(version)
+    def browsers(version = current_version)
       browser_path = "#{@screenshot_dir}/#{version}/"
 
       Dir.glob("#{browser_path}*").map do |browser|
@@ -30,7 +30,7 @@ module Webshot
       end
     end
 
-    def breakpoints(version)
+    def breakpoints(version = current_version)
       browser = browsers(version)[0]
       breakpoint_path = "#{@screenshot_dir}/#{version}/#{browser}/"
 
@@ -39,7 +39,7 @@ module Webshot
       end
     end
 
-    def pages(version)
+    def pages(version = current_version)
       browser = browsers(version)[0]
       pages_path = "#{@screenshot_dir}/#{version}/#{browser}/*/"
 
@@ -73,32 +73,6 @@ module Webshot
       version2 = options[:version2] || current_version
       version1 = options[:version1] || previous_version
       diffs = "#{@diff_dir}/#{browser}#{breakpoint}#{page}#{version1}-vs-#{version2}.png"
-
-      Dir.glob(diffs)
-    end
-
-    def diff_by_version(version, options = {})
-      options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
-      options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
-
-      browser = options[:browser] ? "#{options[:browser]}/" : "*/"
-      breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
-
-      version2 = version
-      version_index = versions.index(version2)
-      version1 = versions[version_index - 1]
-      diffs = "#{@diff_dir}/#{browser}#{breakpoint}**/#{version1}-vs-#{version2}.png"
-
-      Dir.glob(diffs)
-    end
-
-    def diff_by_page(page, options = {})
-      options[:browser] = "{#{options[:browser].join(",")}}" if options[:browser].kind_of?(Array)
-      options[:breakpoint] = "{#{options[:breakpoint].join(",")}}" if options[:breakpoint].kind_of?(Array)
-
-      browser = options[:browser] ? "#{options[:browser]}/" : "*/"
-      breakpoint = options[:breakpoint] ? "#{options[:breakpoint]}/" : "*/"
-      diffs = "#{@diff_dir}/#{browser}#{breakpoint}#{page}/*.png"
 
       Dir.glob(diffs)
     end
