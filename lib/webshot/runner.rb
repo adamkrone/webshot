@@ -40,24 +40,32 @@ module Webshot
     private
 
     def capture_browser(browser)
-      @current_browser = browser
-      @browser_urls = 0
-      puts "\nUsing #{browser.capitalize}...".yellow if @config.settings["verbose"]
-
-      browser_start_time = Time.now
-      @driver = Selenium::WebDriver.for browser.to_sym
-      @base_dir = @config.settings["output"] ? @config.settings["output"] : "."
-      @old_version = get_last_version "#{@base_dir}/screenshots"
+      setup_browser(browser)
 
       @config.settings["breakpoints"].each do |breakpoint|
         capture_breakpoint(breakpoint)
       end
 
+      teardown_browser
+    end
+
+    def setup_browser(browser)
+      @current_browser = browser
+      @browser_urls = 0
+      puts "\nUsing #{browser.capitalize}...".yellow if @config.settings["verbose"]
+
+      @browser_start_time = Time.now
+      @driver = Selenium::WebDriver.for browser.to_sym
+      @base_dir = @config.settings["output"] ? @config.settings["output"] : "."
+      @old_version = get_last_version "#{@base_dir}/screenshots"
+    end
+
+    def teardown_browser
       @driver.quit
       end_time = Time.now
       @urls_captured += @browser_urls
 
-      puts "\nCaptured #{@browser_urls} urls in #{@current_browser.to_s.capitalize} in #{end_time - browser_start_time} seconds.".green
+      puts "\nCaptured #{@browser_urls} urls in #{@current_browser.to_s.capitalize} in #{end_time - @browser_start_time} seconds.".green
     end
 
     def capture_breakpoint(breakpoint)
