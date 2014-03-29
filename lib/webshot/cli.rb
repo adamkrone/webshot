@@ -47,7 +47,7 @@ module Webshot
       end
 
       if urls == nil
-        puts "I don't know what to do with '#{url}'..."
+        puts "I don't know what to do with '#{@config.settings["url"]}'..."
         puts "Please use a valid URL."
         exit
       end
