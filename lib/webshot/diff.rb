@@ -13,41 +13,50 @@ module Webshot
     end
 
     def get_image_diff
-      last_file = @page.old_version(@old_version)
-      new_file = @page.screenshot
+      @last_file = @page.old_version(@old_version)
+      @new_file = @page.screenshot
 
       puts "\tDiff:"
-      puts "\tChecking for #{last_file}..." if @verbose
-      if File.exist?(last_file) and @old_version != nil
-        @diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+      check_file
+    end
+
+    private
+
+    def check_file
+      puts "\tChecking for #{@last_file}..." if @verbose
+      if File.exist?(@last_file) and @old_version != nil
         @diff_file = "#{@old_version}-vs-#{@current_version}.png"
 
-        unless File.directory? @diff_dir
-          FileUtils.mkdir_p @diff_dir
-        end
+        check_dir
 
         if @verbose
           puts "\tComparing:"
-          puts "\tnew version: #{new_file}"
-          puts "\tolder version: #{last_file}"
+          puts "\tnew version: #{@new_file}"
+          puts "\tolder version: #{@last_file}"
         end
 
-        image1 = ImageList.new(last_file)
-        image2 = ImageList.new(new_file)
+        image1 = ImageList.new(@last_file)
+        image2 = ImageList.new(@new_file)
 
         diff = compare_channel(image1, image2)
 
         if diff[1] == 0
           puts "\tNo changes found.".yellow
         else
-          compare(last_file, new_file, true)
+          compare(@last_file, @new_file, true)
         end
       else
         puts "\tScreenshot not found.".yellow
       end
     end
 
-    private
+    def check_dir
+      @diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+
+      unless File.directory? @diff_dir
+        FileUtils.mkdir_p @diff_dir
+      end
+    end
 
     def compare_channel(image1, image2)
       begin
