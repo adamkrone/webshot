@@ -5,7 +5,9 @@ require 'webshot/diff'
 
 module Webshot
   class Runner
-    attr_reader :version, :urls, :browsers, :breakpoints, :config
+    attr_reader :base_dir, :version, :urls, :browsers, :breakpoints, :config,
+                :driver, :old_version, :current_browser, :current_breakpoint,
+                :current_page, :urls_captured, :browser_urls
 
     def initialize(args)
       @config = args[:config]
@@ -38,62 +40,72 @@ module Webshot
     private
 
     def capture_browser(browser)
+      @current_browser = browser
+      @browser_urls = 0
       puts "\nUsing #{browser.capitalize}...".yellow if @config.settings["verbose"]
 
-      current_run_start = Time.now
-      driver = Selenium::WebDriver.for browser
-      base_dir = @config.settings["output"] ? @config.settings["output"] : "."
-      current_version = START_TIME.to_i
-      last_version = get_last_version "#{base_dir}/screenshots"
+      browser_start_time = Time.now
+      @driver = Selenium::WebDriver.for browser.to_sym
+      @base_dir = @config.settings["output"] ? @config.settings["output"] : "."
+      @old_version = get_last_version "#{@base_dir}/screenshots"
 
       @config.settings["breakpoints"].each do |breakpoint|
         capture_breakpoint(breakpoint)
       end
 
-      driver.quit
+      @driver.quit
       end_time = Time.now
-      @urls_captured+= num_urls
+      @urls_captured += @browser_urls
 
-      puts "\nCaptured #{num_urls} urls in #{browser.to_s.capitalize} in #{end_time - current_run_start} seconds.".green
+      puts "\nCaptured #{@browser_urls} urls in #{@current_browser.to_s.capitalize} in #{end_time - browser_start_time} seconds.".green
     end
 
     def capture_breakpoint(breakpoint)
-      directory = "#{base_dir}/screenshots/#{current_version}/#{browser}/#{breakpoint['name']}/"
+      @current_breakpoint = breakpoint
+      directory = "#{@base_dir}/screenshots/#{@version}/#{@current_browser}/#{@current_breakpoint['name']}/"
 
       unless File.directory? directory
         FileUtils.mkdir_p directory
       end
 
-      if options[:diff]
+      if @config.settings[:diff]
         unless File.directory? "diffs/"
           FileUtils.mkdir_p "diffs/"
         end
       end
 
-      puts "\nCapturing #{breakpoint['name']} breakpoint".yellow if @config.settings["verbose"]
+      puts "\nCapturing #{@current_breakpoint['name']} breakpoint".yellow if @config.settings["verbose"]
 
       urls.each do |url|
         puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
 
-        driver.manage.window.resize_to(breakpoint["width"], breakpoint["height"])
-        driver.get url
+        @driver.manage.window.resize_to(@current_breakpoint["width"], @current_breakpoint["height"])
+        @driver.get url
 
-        current_page = Webshot::Page.new(:url => url, :version => current_version, :directory => directory, :browser => browser, :breakpoint => breakpoint["name"])
+        current_page = Webshot::Page.new(:url => url,
+                                         :version => @version,
+                                         :directory => directory,
+                                         :browser => @current_browser,
+                                         :breakpoint => @current_breakpoint["name"])
 
-        sleep options[:wait] || 0
+        sleep @config.settings[:wait] || 0
 
         current_file = current_page.screenshot
 
-        current_page.save(driver)
+        current_page.save(@driver)
 
         puts "Saved to #{current_file}".green if @config.settings["verbose"]
 
         if @config.settings["diff"]
-          current_diff = Webshot::Diff.new(:base_dir => base_dir, :old_version => last_version, :current_version => current_version, :page => current_page, :verbose => @config.settings["verbose"])
+          current_diff = Webshot::Diff.new(:base_dir => @base_dir,
+                                           :old_version => @old_version,
+                                           :current_version => @version.to_i,
+                                           :page => current_page,
+                                           :verbose => @config.settings["verbose"])
           current_diff.get_image_diff
         end
 
-        num_urls += 1
+        @browser_urls += 1
       end
     end
 
