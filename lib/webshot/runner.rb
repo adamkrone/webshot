@@ -102,20 +102,27 @@ module Webshot
     def save_screenshot(url)
       puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
 
-      @driver.manage.window.resize_to(@current_breakpoint.width, @current_breakpoint.height)
-      @driver.get url
+      resize_driver
 
-      @current_page = Webshot::Page.new(:url => url,
-                                       :version => @version,
-                                       :directory => @directory,
-                                       :browser => @current_browser,
-                                       :breakpoint => @current_breakpoint.name)
-
+      @current_page = load_page(url)
       sleep @config.settings[:wait] || 0
 
       @current_page.save(@driver)
 
       puts "Saved to #{current_page.screenshot}".green if @config.settings["verbose"]
+    end
+
+    def resize_driver
+      @driver.manage.window.resize_to(@current_breakpoint.width, @current_breakpoint.height)
+    end
+
+    def load_page(url)
+      @driver.get url
+      Webshot::Page.new(:url => url,
+                        :version => @version,
+                        :directory => @directory,
+                        :browser => @current_browser,
+                        :breakpoint => @current_breakpoint.name)
     end
 
     def save_diff
