@@ -14,7 +14,7 @@ module Webshot
       begin
         url = URI.parse(@sitemap_url)
         request = Net::HTTP.get_response(url).body
-      rescue URI::InvalidURIError, TypeError
+      rescue URI::InvalidURIError, TypeError, NoMethodError
         return nil
       end
 
