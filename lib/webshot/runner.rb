@@ -20,17 +20,11 @@ module Webshot
       start_time = @version.to_i
       begin
         @browsers.each do |name|
-          puts "\nUsing #{name.capitalize}...".yellow if @config.settings["verbose"]
-
           browser = Webshot::Browser.new(name, @config)
           browser.capture
-
-          puts "\nCaptured #{@urls.length * @breakpoints.length} urls in #{name.capitalize} in #{browser.end_time - browser.start_time} seconds.".green
         end
-      rescue Selenium::WebDriver::Error::UnknownError => e
+      rescue Selenium::WebDriver::Error::UnknownError
         puts "Sorry, we encountered an error..."
-        puts e.message
-        puts e.backtrace
         exit
       end
 
