@@ -18,7 +18,7 @@ module Webshot
     end
 
     desc "capture", "Captures screenshots of a page or pages"
-    option :url, :aliases => "-u"
+    option :urls, :type => :array, :aliases => "-u"
     option :sitemap, :aliases => "-s"
     option :browsers, :type => :array
     option :breakpoints, :type => :array
@@ -41,16 +41,16 @@ module Webshot
 
     def verify_config(options)
       if options.count == 0 && @config.settings == nil
-        puts "You must provide a --url, or configure a Shotfile using 'webshot init'."
+        puts "You must provide one or more --urls, a --sitemap, or configure a Shotfile using 'webshot init'."
         exit
       end
     end
 
     def get_urls
       if @config.settings["sitemap"]
-        urls = Webshot::Sitemap.new(@config.settings["url"]).urls
+        urls = Webshot::Sitemap.new(@config.settings["sitemap"]).urls
       else
-        urls = ["#{@config.settings['url']}"]
+        urls = @config.settings['urls']
       end
 
       if urls == nil

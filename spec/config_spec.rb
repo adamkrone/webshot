@@ -9,18 +9,16 @@ describe Webshot::Config do
     end
 
     describe "when there is no Shotfile" do
-      it "should return nil" do
+      it "should return {}" do
         Dir.chdir("spec") do
-          expect(config.check_for_config).to be_nil
+          expect(config.check_for_config).to eq({})
         end
       end
     end
   end
 
   describe "#create_config" do
-    after(:all) do
-      Dir.chdir("spec") { File.delete "Shotfile" }
-    end
+    after(:all) { Dir.chdir("spec") { File.delete "Shotfile" } }
 
     it "should create a new Shotfile" do
       Dir.chdir("spec") do
