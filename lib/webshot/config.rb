@@ -4,9 +4,9 @@ module Webshot
   class Config
     attr_accessor :settings
 
-    def initialize(options)
+    def initialize(options=nil)
       @settings = check_for_config
-      merge_options(options)
+      merge_options(options) if options
       @settings["base_dir"] = @settings["output"] ? @settings["output"] : "."
       @settings["last_version"] = last_version
     end
@@ -15,13 +15,13 @@ module Webshot
       if File.exist? "Shotfile"
         YAML.load(File.read "Shotfile")
       else
-        nil
+        {}
       end
     end
 
     def merge_options(options)
       options.each do |option, value|
-        @config.settings[option.to_s] = value
+        @settings[option.to_s] = value
       end
     end
 
@@ -35,8 +35,12 @@ module Webshot
       end
     end
 
+    def shotfile_exists?
+      File.exist?("Shotfile")
+    end
+
     def create_config(force=false)
-      if @settings and !force
+      if shotfile_exists? and !force
         puts "You already have a Shotfile."
         return false
       end
@@ -45,8 +49,7 @@ module Webshot
 
       File.open("Shotfile", "w") do |f|
         config = {
-          "url" => "http://example.com",
-          "sitemap" => false,
+          "urls" => ["http://example.com"],
           "browsers" => ["firefox"],
           "breakpoints" => ["320x480", "480x320", "768x1024", "1024x768"],
           "diff" => true,
