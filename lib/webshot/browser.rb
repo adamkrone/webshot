@@ -1,3 +1,5 @@
+require 'colorize'
+
 require 'webshot/breakpoint'
 
 module Webshot
@@ -23,7 +25,7 @@ module Webshot
     end
 
     def setup
-      puts "\nUsing #{@name.capitalize}...".yellow if @config.settings["verbose"]
+      @config.log(:info, :yellow, "Using #{@name.capitalize}...\n")
 
       @config.settings["current_browser"] = @name
       @config.settings["current_browser_dir"] = "#{@config.settings["base_dir"]}/screenshots/#{@config.settings["version"]}/#{@config.settings["current_browser"]}"
@@ -35,7 +37,7 @@ module Webshot
       @driver.quit
       @end_time = Time.now
 
-      puts "\nCaptured #{@urls.length * @breakpoints.length} urls in #{@name.capitalize} in #{@end_time - @start_time} seconds.".green
+      @config.log(:info, :green, "Captured #{@urls.length * @breakpoints.length} urls in #{@name.capitalize} in #{@end_time - @start_time} seconds.")
     end
   end
 end

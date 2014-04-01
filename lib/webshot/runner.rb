@@ -1,4 +1,5 @@
 require 'selenium-webdriver'
+require 'colorize'
 
 require 'webshot/browser'
 
@@ -29,7 +30,7 @@ module Webshot
       end
 
       end_time = Time.now.to_i
-      puts "Total: captured #{@urls.length * @browsers.length * @breakpoints.length} urls in #{end_time - start_time} seconds.".green
+      @config.log(:info, :green, "Total: captured #{@urls.length * @browsers.length * @breakpoints.length} urls in #{end_time - start_time} seconds.")
     end
   end
 end

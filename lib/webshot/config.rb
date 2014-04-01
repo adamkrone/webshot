@@ -1,4 +1,5 @@
 require 'yaml'
+require 'logger'
 
 module Webshot
   class Config
@@ -8,7 +9,9 @@ module Webshot
       @settings = check_for_config
       merge_options(options) if options
       @settings["base_dir"] = @settings["output"] ? @settings["output"] : "."
+      @settings["version"] = Time.now.to_i
       @settings["last_version"] = last_version
+      configure_logger
     end
 
     def check_for_config
@@ -23,6 +26,39 @@ module Webshot
       options.each do |option, value|
         @settings[option.to_s] = value
       end
+    end
+
+    def configure_logger
+      if @settings["log_dir"]
+        @settings["logger"] = Logger.new(log_file)
+        @settings["logger"].level = log_level
+      end
+    end
+
+    def log_file
+      FileUtils.mkdir_p(@settings["log_dir"])
+      return File.open("#{@settings["log_dir"]}/#{@settings["version"]}.log",
+                       File::WRONLY | File::APPEND | File::CREAT)
+    end
+
+    def log_level
+      if @settings["log_level"]
+        case @settings["log_level"]
+        when debug
+          return Logger::DEBUG
+        else
+          return Logger::INFO
+        end
+      else
+        return Logger::INFO
+      end
+    end
+
+    def log(level, color, msg)
+      colored_msg = msg.method(color)
+      puts colored_msg.call
+      logger = @settings["logger"].method(level)
+      logger.call(msg)
     end
 
     def last_version
@@ -53,7 +89,7 @@ module Webshot
           "browsers" => ["firefox"],
           "breakpoints" => ["320x480", "480x320", "768x1024", "1024x768"],
           "diff" => true,
-          "verbose" => false
+          "log_dir" => "logs"
         }
 
         f.write config.to_yaml
