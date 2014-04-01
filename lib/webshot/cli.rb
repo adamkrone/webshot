@@ -8,8 +8,6 @@ require 'webshot/runner'
 
 module Webshot
   class CLI < Thor
-    START_TIME = Time.now
-
     desc "init", "Initialize project with Shotfile"
     option :force, :type => :boolean, :aliases => "-f"
     def init
@@ -27,10 +25,8 @@ module Webshot
     option :wait, :type => :numeric, :aliases => "-w"
     option :verbose, :aliases => "-v"
     def capture
-      start_time = START_TIME.to_i
       @config = Webshot::Config.new(options)
       verify_config(options)
-      @config.settings["version"] = START_TIME.to_i
       @config.settings["urls"] = get_urls
 
       runner = Webshot::Runner.new(@config)

@@ -1,3 +1,4 @@
+require 'colorize'
 require 'rmagick'
 require 'open3'
 include Magick
@@ -17,23 +18,23 @@ module Webshot
       @last_file = @page.last_screenshot(@last_version)
       @new_file = @page.screenshot
 
-      puts "\tDiff:"
+      @config.log(:info, :white, "\tDiff:")
       check_file
     end
 
     private
 
     def check_file
-      puts "\tChecking for #{@last_file}..." if @last_version != nil
+      @config.log(:info, :white, "\tChecking for #{@last_file}...") if @last_version != nil
       if File.exist?(@last_file)
         @diff_file = "#{@last_version}-vs-#{@current_version}.png"
 
         create_dir
 
         if @verbose
-          puts "\tComparing:"
-          puts "\tnew version: #{@new_file}"
-          puts "\tolder version: #{@last_file}"
+          @config.log(:info, :white, "\tComparing:")
+          @config.log(:info, :white, "\tnew version: #{@new_file}")
+          @config.log(:info, :white, "\tolder version: #{@last_file}")
         end
 
         image1 = ImageList.new(@last_file)
@@ -42,12 +43,12 @@ module Webshot
         diff = compare_channel(image1, image2)
 
         if diff[1] == 0
-          puts "\tNo changes found.".yellow
+          @config.log(:info, :yellow, "\tNo changes found.\n")
         else
           compare(@last_file, @new_file, true)
         end
       else
-        puts "\tScreenshot not found.".yellow
+        @config.log(:info, :yellow, "\tScreenshot not found.\n")
       end
     end
 
@@ -75,13 +76,13 @@ module Webshot
 
       if error.include? "differs"
         if retry_compare
-          puts "\tImage size differs, swapping image order...".yellow if @verbose
+          @config.log(:info, :yellow, "\tImage size differs, swapping image order...")
           compare(file2, file1, false)
         else
-          puts "\tCouldn't save diff file!".red
+          @config.log(:warn, :red, "\tCouldn't save diff file!\n")
         end
       else
-        puts "\tDiff saved to #{@diff_dir}/#{@diff_file}.".green
+        @config.log(:info, :green, "\tDiff saved to #{@diff_dir}/#{@diff_file}.\n")
       end
     end
   end

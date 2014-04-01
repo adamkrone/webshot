@@ -1,3 +1,5 @@
+require 'colorize'
+
 require 'webshot/diff'
 
 module Webshot
@@ -42,7 +44,7 @@ module Webshot
       mkdirs
       @driver.get @url
       @driver.save_screenshot(screenshot)
-      puts "Saved to #{screenshot}".green if @config.settings["verbose"]
+      @config.log(:info, :green, "Saved to #{screenshot}")
       save_diff
     end
 

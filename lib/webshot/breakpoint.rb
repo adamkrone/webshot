@@ -1,3 +1,5 @@
+require 'colorize'
+
 require 'webshot/page'
 
 module Webshot
@@ -37,7 +39,7 @@ module Webshot
       create_directory
       resize_driver
 
-      puts "\nCapturing #{@name} breakpoint".yellow if @config.settings["verbose"]
+      @config.log(:info, :yellow, "Capturing #{@name} breakpoint\n")
     end
 
     def create_directory
@@ -51,7 +53,7 @@ module Webshot
     end
 
     def save_screenshot(url)
-      puts "\nSaving screenshot of #{url}..." if @config.settings["verbose"]
+      @config.log(:info, :white, "Saving screenshot of #{url}...")
 
       page = Webshot::Page.new(url, @driver, @config)
       sleep @config.settings[:wait] || 0
