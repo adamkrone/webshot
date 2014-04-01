@@ -28,27 +28,16 @@ module Webshot
     option :verbose, :aliases => "-v"
     def capture
       start_time = START_TIME.to_i
-      @config = Webshot::Config.new
-      @total_urls = 0
-
-      merge_options(options)
+      @config = Webshot::Config.new(options)
       verify_config(options)
-      urls = get_urls
-      set_breakpoints
+      @config.settings["version"] = START_TIME.to_i
+      @config.settings["urls"] = get_urls
 
-      runner = Webshot::Runner.new(:config => @config,
-                                   :version => START_TIME.to_i,
-                                   :urls => urls)
+      runner = Webshot::Runner.new(@config)
       runner.start
     end
 
     private
-
-    def merge_options(options)
-      options.each do |option, value|
-        @config.settings[option.to_s] = value
-      end
-    end
 
     def verify_config(options)
       if options.count == 0 && @config.settings == nil
@@ -70,17 +59,6 @@ module Webshot
         exit
       else
         return urls
-      end
-    end
-
-    def set_breakpoints
-      if @config.settings["breakpoints"]
-        @config.settings["breakpoints"].each_with_index do |breakpoint, i|
-          @config.settings["breakpoints"][i] = Webshot::Breakpoint.new(breakpoint)
-        end
-      else
-        puts "You must provide at least one breakpoint."
-        exit
       end
     end
   end

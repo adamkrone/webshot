@@ -4,16 +4,17 @@ include Magick
 
 module Webshot
   class Diff
-    def initialize(args)
-      @base_dir = args[:base_dir]
-      @old_version = args[:old_version]
-      @current_version = args[:current_version]
-      @page = args[:page]
-      @verbose = args[:verbose]
+    def initialize(page, config)
+      @page = page
+      @config = config
+      @base_dir = @config.settings["base_dir"]
+      @last_version = @config.settings["last_version"]
+      @current_version = @config.settings["version"]
+      @verbose = @config.settings["verbose"]
     end
 
-    def get_image_diff
-      @last_file = @page.old_version(@old_version)
+    def save
+      @last_file = @page.last_screenshot(@last_version)
       @new_file = @page.screenshot
 
       puts "\tDiff:"
@@ -23,11 +24,11 @@ module Webshot
     private
 
     def check_file
-      puts "\tChecking for #{@last_file}..." if @verbose
-      if File.exist?(@last_file) and @old_version != nil
-        @diff_file = "#{@old_version}-vs-#{@current_version}.png"
+      puts "\tChecking for #{@last_file}..." if @last_version != nil
+      if File.exist?(@last_file)
+        @diff_file = "#{@last_version}-vs-#{@current_version}.png"
 
-        check_dir
+        create_dir
 
         if @verbose
           puts "\tComparing:"
@@ -50,8 +51,8 @@ module Webshot
       end
     end
 
-    def check_dir
-      @diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.url}"
+    def create_dir
+      @diff_dir = "#{@base_dir}/diffs/#{@page.browser}/#{@page.breakpoint}/#{@page.stripped_url}"
 
       unless File.directory? @diff_dir
         FileUtils.mkdir_p @diff_dir

@@ -4,13 +4,32 @@ module Webshot
   class Config
     attr_accessor :settings
 
-    def initialize()
+    def initialize(options)
       @settings = check_for_config
+      merge_options(options)
+      @settings["base_dir"] = @settings["output"] ? @settings["output"] : "."
+      @settings["last_version"] = last_version
     end
 
     def check_for_config
       if File.exist? "Shotfile"
         YAML.load(File.read "Shotfile")
+      else
+        nil
+      end
+    end
+
+    def merge_options(options)
+      options.each do |option, value|
+        @config.settings[option.to_s] = value
+      end
+    end
+
+    def last_version
+      screenshots_dir = "#{@settings["base_dir"]}/screenshots"
+      last_dir = Dir.glob("#{screenshots_dir}/*").max
+      if last_dir
+        last_dir.gsub(screenshots_dir + "/", "")
       else
         nil
       end
