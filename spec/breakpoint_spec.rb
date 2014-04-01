@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe Webshot::Breakpoint do
-  let(:breakpoint) { Webshot::Breakpoint.new("1024x768") }
+  let(:config) { double("config", :settings => {}) }
+  let(:driver) { double("driver") }
+  let(:breakpoint) { Webshot::Breakpoint.new("1024x768", driver, config) }
 
   it "should have a name" do
     expect(breakpoint.name).to eq("1024x768")
