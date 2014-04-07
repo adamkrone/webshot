@@ -24,6 +24,7 @@ module Webshot
     option :diff, :type => :boolean, :aliases => "-d"
     option :wait, :type => :numeric, :aliases => "-w"
     option :verbose, :aliases => "-v"
+    option :version
     def capture
       @config = Webshot::Config.new(options)
       verify_config(options)

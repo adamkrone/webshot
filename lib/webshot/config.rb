@@ -7,9 +7,9 @@ module Webshot
 
     def initialize(options=nil)
       @settings = check_for_config
+      @settings["version"] = Time.now.to_i
       merge_options(options) if options
       @settings["base_dir"] = @settings["output"] ? @settings["output"] : "."
-      @settings["version"] = Time.now.to_i
       @settings["last_version"] = last_version
       configure_logger
     end
