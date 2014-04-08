@@ -1,5 +1,5 @@
 require 'colorize'
-require 'rmagick'
+require 'RMagick'
 require 'open3'
 include Magick
 
