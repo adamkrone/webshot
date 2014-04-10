@@ -57,8 +57,10 @@ module Webshot
     def log(level, color, msg)
       colored_msg = msg.method(color)
       puts colored_msg.call
-      logger = @settings["logger"].method(level)
-      logger.call(msg)
+      if @settings["logger"]
+        logger = @settings["logger"].method(level)
+        logger.call(msg)
+      end
     end
 
     def last_version
