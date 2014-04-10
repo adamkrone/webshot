@@ -22,8 +22,7 @@ describe Webshot::Config do
 
     it "should create a new Shotfile" do
       Dir.chdir("spec") do
-        config.create_config
-        created = File.exist?("Shotfile")
+        created = config.create_config
 
         expect(created).to be_true
       end
@@ -31,12 +30,18 @@ describe Webshot::Config do
 
     describe "when a Shotfile exists" do
       it "should return false" do
-        expect(config.create_config).to be_false
+        Dir.chdir("spec") do
+          expect(config.create_config).to be_false
+        end
       end
 
       describe "and when forced" do
         it "should overwrite the Shotfile" do
-          pending "Find best way to check for overwrite"
+          Dir.chdir("spec") do
+            created = config.create_config(true)
+
+            expect(created).to be true
+          end
         end
       end
     end

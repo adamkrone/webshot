@@ -94,6 +94,8 @@ module Webshot
 
         f.write config.to_yaml
       end
+
+      return true
     end
   end
 end
