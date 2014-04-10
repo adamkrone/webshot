@@ -4,6 +4,8 @@ require 'open3'
 include Magick
 
 module Webshot
+  Response = Struct.new(:success, :msg)
+
   class Diff
     def initialize(page, config)
       @page = page
@@ -12,6 +14,7 @@ module Webshot
       @last_version = @config.settings["last_version"]
       @current_version = @config.settings["version"]
       @verbose = @config.settings["verbose"]
+      @response = Response.new()
     end
 
     def save
@@ -20,6 +23,8 @@ module Webshot
 
       @config.log(:info, :white, "\tDiff:")
       check_file
+
+      return @response
     end
 
     private
@@ -44,11 +49,15 @@ module Webshot
 
         if diff[1] == 0
           @config.log(:info, :yellow, "\tNo changes found.\n")
+          @response.success = true
+          @response.msg = "No changes found."
         else
           compare(@last_file, @new_file, true)
         end
       else
-        @config.log(:info, :yellow, "\tScreenshot not found.\n")
+        @config.log(:info, :yellow, "\tPrevious screenshot not found.\n")
+        @response.success = true
+        @response.msg = "Previous screenshot not found."
       end
     end
 
@@ -80,9 +89,13 @@ module Webshot
           compare(file2, file1, false)
         else
           @config.log(:warn, :red, "\tCouldn't save diff file!\n")
+          @response.success = false
+          @response.msg = "Couldn't save diff file."
         end
       else
         @config.log(:info, :green, "\tDiff saved to #{@diff_dir}/#{@diff_file}.\n")
+        @response.success = true
+        @response.msg = "Diff saved to #{@diff_dir}/#{@diff_file}."
       end
     end
   end
